@@ -1,70 +1,42 @@
+import java.io.*;
 
-public class ChatMessage
-{
-    private String IPSender;
-    private String IPreceiver;
+public class ChatMessage implements Serializable{
     private String message;
-    private String datetime;
-    private String nickname;
-    
-    public ChatMessage(){}
-    
-    public ChatMessage(String senderIP, String receiverIP, String message, String datetime, String nickname)
-    {
-        this.IPSender = senderIP;
-        this.IPreceiver = receiverIP;
+    private String userName;
+    private String timeStamp;
+
+    ChatMessage(String message, String username, String timestamp){
         this.message = message;
-        this.datetime = datetime;
-        this.nickname = nickname;
+        this.userName = username;
+        this.timeStamp = timestamp;
     }
-    
-    public String getSenderIP()
-    {
-        return IPSender;
-    }
-    
-    public void setSenderIP(String senderIP)
-    {
-        this.IPSender = senderIP;
-    }
-    
-    public String getReceiverIP()
-    {
-        return IPreceiver;
-    }
-    
-    public void setReceiverIP(String receiverIP)
-    {
-        this.IPreceiver = receiverIP;
-    }
-    
-    public String getMessage()
-    {
+
+    public String getMessage(){
         return message;
     }
-    
-    public void setMessage(String message)
-    {
-        this.message = message;
+
+    public String getUserName(){
+        return userName;
     }
-    
-    public String getDateTime()
-    {
-        return datetime;
+
+    public String getTimeStamp(){
+        return timeStamp;
     }
-    
-    public void setDateTime(String datetime)
-    {
-        this.datetime = datetime;
-    }
-    
-    public String getNickname()
-    {
-        return nickname;
-    }
-    
-    public void setNickname(String nickname)
-    {
-        this.nickname = nickname;
-    }
+
+
 }
+
+/*
+    //Method for main
+    public static sendMessage (Socket socket, ChatMessage cm){
+        ObjectOutputStream sOutput = new ObjectOutputStream(socket.getOutputStream());
+        sOutput.writeObject(cm);
+
+    }
+        System.out.println("Enter -1 to exit");
+        String userInput = input.nextLine();
+    while (!("-1".equals(userInput))){
+        cm(userInput, username, timestamp);
+        sendMessage (socket, cm);
+        userInput = input.nextLine();
+        }*/

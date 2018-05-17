@@ -7,11 +7,13 @@ import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
-import static jdk.nashorn.tools.ShellFunctions.input;
+import java.util.Date;
 
 
 public class Server
 {
+    private static Customer customer = null;
+    
     public static void main(String[] args)
     {
         ServerSocket serverSocket;
@@ -40,6 +42,7 @@ public class Server
     {
         Socket server;
         ArrayList<Agent> agentList = new ArrayList<Agent>();
+        ArrayList<Customer> customerList = new ArrayList<Customer>();
         ConnectionHandler(Socket socket)
         {
             server = socket;
@@ -50,61 +53,88 @@ public class Server
         {
             try
             {
-                
                 PrintWriter toClient = new PrintWriter(server.getOutputStream());
                 BufferedReader fromClient = new BufferedReader(new InputStreamReader(server.getInputStream()));
                 
-                toClient.println("Welcome to Line Networks customer service!");
-                toClient.println("Please select your login method: [CUSTOMER/AGENT]");
                 String usertype = fromClient.readLine();
+                String username = null;
                 
                 if("customer".equalsIgnoreCase(usertype))
                 {
-                    String username = fromClient.readLine();
+                    username = fromClient.readLine();
+                    customer = new Customer(username, server);
+                    customerList.add(customer);
                     boolean agentFound = false;
                     int x = 0;
                     
                     while(agentFound)
                     {
-                        toClient.println("Looking for Free Agent");
-                        
                         for(x = 0; x < agentList.size(); x ++)
                         {
                             if(agentList.get(x).getNumOfCustomers() < 2)
                             {
                                 agentList.get(x).addCustomer(server);
                                 agentFound = true;
+                                toClient.println("agent found");
                                 break;
                             }
                         }
                     }
                     
                     Socket agentSocket = agentList.get(x).getAgentSocket();
+                    String userInput = null;
+                    Date timestamp = new Date();
                     
-                    toClient.println("Enter -1 to exit");
-                    String userInput = fromClient.readLine();
-                    
-                    Chat agentChat = new Chat(server);
-                    
-                    while (!("-1".equals(userInput)))
+                    while (!("/exit".equals(userInput)))
                     {
-                        cm(userInput, username, timestamp);
-                        sendMessage (agentSocket, cm);
+                        userInput = fromClient.readLine();
+                        ChatMessage cm = new ChatMessage(userInput, username, timestamp.toString());
+                        sendMessage(agentSocket, cm);
                     }
-                    agentChat.kill();
                 }
                 
                 else if ("agent".equalsIgnoreCase(usertype))
                 {
-                    toClient.println("Enter your Agent ID : ");
                     String id = fromClient.readLine();
-                    toClient.println("Please enter your password : ");
                     String pw = fromClient.readLine();
                     
                     if(Authenticate(id, pw, server) == true)
                     {
+                        toClient.println("agent authentication successful");
+                        toClient.flush();
                         Agent agent = new Agent(server);
                         agentList.add(agent);
+                        String userInput = null;
+                        Date timestamp = new Date();
+                        Socket receiver = null;
+                        int y, z;
+                        
+                        while(!("/exit".equals(userInput)))
+                        {
+                            if(agentList.get(agentList.indexOf(server)).getNumOfCustomers() == 1 || agentList.get(agentList.indexOf(server)).getNumOfCustomers() == 2)
+                            {
+                                toClient.println("customer found");
+                                
+                                for(y = 0; y < customerList.size(); y ++)
+                                {
+                                    for(z = 0; z < agent.customerSocketList.size(); z ++)
+                                    {
+                                        if(customerList.get(y).getCustomerSocket() == agent.getCustomerSocket(z))
+                                        {
+                                            receiver = customerList.get(y).getCustomerSocket();
+                                            username = customerList.get(y).getUsername();
+                                            toClient.println(username);
+                                            break;
+                                        }
+                                    }
+                                }
+                                
+                                if(!("/exit".equals(userInput)))
+                                {
+                                    ChatMessage cm = new ChatMessage(userInput, username, timestamp.toString());
+                                }
+                            }
+                        }
                     }
                     
                     String userInput = "";

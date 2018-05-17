@@ -1,7 +1,16 @@
 
+import java.net.Socket;
+
+
 public class Customer
 {
     private String username;
+    private Socket customerSocket;
+
+    public Socket getCustomerSocket()
+    {
+        return customerSocket;
+    }
 
     public String getUsername()
     {
@@ -13,8 +22,9 @@ public class Customer
         this.username = username;
     }
 
-    public Customer(String username)
+    public Customer(String username, Socket customerSocket)
     {
         this.username = username;
+        this.customerSocket = customerSocket;
     }
 }

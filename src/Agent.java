@@ -6,7 +6,7 @@ public class Agent
 {
     //declare attributes of Agent class
     private Socket agentSocket;
-    private ArrayList<Socket> customerSocketList;
+    public ArrayList<Socket> customerSocketList;
     private int numOfCustomers;
     private int customerIndex;
 
